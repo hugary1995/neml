@@ -6,6 +6,7 @@
 #include "surfaces.h"
 #include "hardening.h"
 #include "interpolate.h"
+#include "history.h"
 
 #include "windows.h"
 
@@ -19,9 +20,11 @@ class NEML_EXPORT ViscoPlasticFlowRule: public NEMLObject {
   ViscoPlasticFlowRule(ParameterSet & params);
 
   /// Number of history variables
-  virtual size_t nhist() const = 0;
+  virtual void populate_hist(History & hist) const = 0;
   /// Initialize history at time zero
-  virtual void init_hist(double * const h) const = 0;
+  virtual void init_hist(History & hist) const = 0;
+  /// Number of history variables, temporary
+  virtual size_t nhist() const;
 
   /// Scalar flow rate
   virtual void y(const double* const s, const double* const alpha, double T,
@@ -154,9 +157,9 @@ class NEML_EXPORT PerzynaFlowRule : public ViscoPlasticFlowRule {
   static ParameterSet parameters();
 
   /// Number of history variables
-  virtual size_t nhist() const;
+  virtual void populate_hist(History & hist) const;
   /// Initialize history at time zero
-  virtual void init_hist(double * const h) const;
+  virtual void init_hist(History & hist) const;
 
   /// Scalar strain rate
   virtual void y(const double* const s, const double* const alpha, double T,
@@ -276,10 +279,10 @@ class NEML_EXPORT ChabocheFlowRule: public ViscoPlasticFlowRule {
   /// Return default parameters
   static ParameterSet parameters();
 
-  /// Number of history variables (from the hardening model)
-  virtual size_t nhist() const;
+  /// Number of history variables
+  virtual void populate_hist(History & hist) const;
   /// Initialize history at time zero
-  virtual void init_hist(double * const h) const;
+  virtual void init_hist(History & hist) const;
 
   // Scalar inelastic strain rate
   virtual void y(const double* const s, const double* const alpha, double T,
@@ -364,11 +367,10 @@ class NEML_EXPORT YaguchiGr91FlowRule: public ViscoPlasticFlowRule {
   /// Default parameter set
   static ParameterSet parameters();
 
-  /// Number of history variables (14)
-  virtual size_t nhist() const;
-  /// Initialize history (6 values for X1, 6 values for X2, 1 value for Q and
-  /// 1 value for sigma_a)
-  virtual void init_hist(double * const h) const;
+  /// Number of history variables
+  virtual void populate_hist(History & hist) const;
+  /// Initialize history at time zero
+  virtual void init_hist(History & hist) const;
 
   /// Scalar inelastic strain rate
   virtual void y(const double* const s, const double* const alpha, double T,
